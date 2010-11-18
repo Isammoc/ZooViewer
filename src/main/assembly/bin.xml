@@ -1,0 +1,31 @@
+<assembly>
+	<id>bin</id>
+
+	<formats>
+		<format>tar.gz</format>
+		<format>tar.bz2</format>
+		<format>zip</format>
+		<format>dir</format>
+	</formats>
+
+	<fileSets>
+		<fileSet>
+			<directory>src/deploy/resources</directory>
+			<outputDirectory></outputDirectory>
+		</fileSet>
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>true</useProjectArtifact>
+			<outputDirectory>lib</outputDirectory>
+		</dependencySet>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>bin</outputDirectory>
+			<includes>
+				<include>${project.artifactId}*</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+</assembly>

@@ -1,0 +1,129 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>net.isammoc.zooviewer</groupId>
+	<artifactId>zooviewer</artifactId>
+	<version>0.4-SNAPSHOT</version>
+
+	<name>ZooViewer</name>
+	<description>A graphical application to view and manage ZooKeeper
+	</description>
+	<inceptionYear>2010</inceptionYear>
+	<url>http://code.google.com/p/zooviewer/</url>
+
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License v3+</name>
+			<url>http://www.gnu.org/licenses/lgpl.html</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<url>http://code.google.com/p/zooviewer/source/browse/</url>
+		<connection>scm:svn:http://zooviewer.googlecode.com/svn/</connection>
+		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/</developerConnection>
+		<tag>trunk</tag>
+	</scm>
+
+	<issueManagement>
+		<system>Google Code Issue Tracking</system>
+		<url>http://code.google.com/p/zooviewer/issues/list</url>
+	</issueManagement>
+
+	<distributionManagement>
+		<downloadUrl>http://code.google.com/p/zooviewer/downloads/list</downloadUrl>
+		<repository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>zooviewer.googlecode.releases</id>
+			<name>Official ZooViewer repository</name>
+			<url>scm:svn:https://zooviewer.googlecode.com/svn/maven2/</url>
+			<layout>default</layout>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>zooviewer.googlecode.snapshots</id>
+			<name>ZooViewer repository for snapshot versions</name>
+			<url>scm:svn:https://zooviewer.googlecode.com/svn/maven2-snapshots/</url>
+			<layout>default</layout>
+		</snapshotRepository>
+		<site>
+			<id>zooviewer.googlecode.site</id>
+			<name>ZooViewer site</name>
+			<url>scm:svn:https://zooviewer.googlecode.com/svn/site</url>
+		</site>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>Sébastien BREVET</name>
+		</developer>
+		<developer>
+			<name>Franck LEFEVRE</name>
+		</developer>
+	</developers>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>../lib/</classpathPrefix>
+							<mainClass>net.isammoc.zooviewer.App</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.2-beta-5</version>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/bin.xml</descriptor>
+					</descriptors>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>2.2</version>
+			</plugin>
+		</plugins>
+	</build>
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>zookeeper</artifactId>
+			<version>3.3.1</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jmxri</artifactId>
+					<groupId>com.sun.jmx</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>jmxtools</artifactId>
+					<groupId>com.sun.jdmk</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.1</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+</project>
