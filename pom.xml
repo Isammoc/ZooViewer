@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.isammoc.zooviewer</groupId>
 	<artifactId>zooviewer</artifactId>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 
 	<name>ZooViewer</name>
 	<description>A graphical application to view and manage ZooKeeper
@@ -19,9 +19,9 @@
 	</licenses>
 
 	<scm>
-		<url>http://code.google.com/p/zooviewer/source/browse/tags/zooviewer-0.4</url>
-		<connection>scm:svn:http://zooviewer.googlecode.com/svn/tags/zooviewer-0.4</connection>
-		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/tags/zooviewer-0.4</developerConnection>
+		<url>http://code.google.com/p/zooviewer/source/browse/trunk</url>
+		<connection>scm:svn:http://zooviewer.googlecode.com/svn/trunk</connection>
+		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/trunk</developerConnection>
 	</scm>
 
 	<issueManagement>
