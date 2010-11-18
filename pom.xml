@@ -20,10 +20,10 @@
 	</licenses>
 
 	<scm>
-		<url>http://code.google.com/p/zooviewer/source/browse/</url>
-		<connection>scm:svn:http://zooviewer.googlecode.com/svn/</connection>
-		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/</developerConnection>
-		<tag>trunk</tag>
+		<url>http://code.google.com/p/zooviewer/source/browse/trunk</url>
+		<connection>scm:svn:http://zooviewer.googlecode.com/svn/trunk</connection>
+		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/trunk</developerConnection>
+		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
@@ -97,8 +97,20 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<version>2.2</version>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<providerImplementations>
+						<svn>javasvn</svn>
+					</providerImplementations>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.google.code.maven-scm-provider-svnjava</groupId>
+						<artifactId>maven-scm-provider-svnjava</artifactId>
+						<version>1.12</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 		</plugins>
 	</build>
