@@ -23,7 +23,6 @@
 		<url>http://code.google.com/p/zooviewer/source/browse/trunk</url>
 		<connection>scm:svn:http://zooviewer.googlecode.com/svn/trunk</connection>
 		<developerConnection>scm:svn:https://zooviewer.googlecode.com/svn/trunk</developerConnection>
-		<tag>HEAD</tag>
 	</scm>
 
 	<issueManagement>
@@ -64,6 +63,23 @@
 	</developers>
 
 	<build>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-scm</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+			<extension>
+				<groupId>org.apache.maven.scm</groupId>
+				<artifactId>maven-scm-manager-plexus</artifactId>
+				<version>1.4</version>
+			</extension>
+			<extension>
+				<groupId>com.google.code.maven-scm-provider-svnjava</groupId>
+				<artifactId>maven-scm-provider-svnjava</artifactId>
+				<version>1.12</version>
+			</extension>
+		</extensions>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
