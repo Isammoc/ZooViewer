@@ -41,8 +41,6 @@ public interface ZVModel {
      */
     void deleteNodes(ZVNode[] nodes);
 
-    void deleteNodeAndChildren(String path);
-
     void close() throws InterruptedException;
 
     ZVNode getNode(String path);
