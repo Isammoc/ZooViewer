@@ -27,7 +27,19 @@ public interface ZVModel {
 
     void updateData(String path, byte[] data);
 
-    void deleteNode(String path);
+    /**
+     * Deletes a node and his children.
+     * 
+     * @param node the node to be deleted
+     */
+    void deleteNode(ZVNode node);
+
+    /**
+     * Deletes a list of nodes and their children.
+     * 
+     * @param paths the nodes to be deleted
+     */
+    void deleteNodes(ZVNode[] nodes);
 
     void deleteNodeAndChildren(String path);
 
