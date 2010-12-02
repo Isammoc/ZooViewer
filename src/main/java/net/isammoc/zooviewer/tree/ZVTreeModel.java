@@ -45,16 +45,16 @@ public class ZVTreeModel implements TreeModel {
 
 	    @Override
 	    public void nodeDataChanged(ZVNode node) {
-		// FLE+
-		// System.out.println("nodeDataChanged : " + node);
-		// TreePath parentPath =
-		// ZVTreeModel.this.getTreePath(node).getParentPath();
-		// int index =
-		// ZVTreeModel.this.getIndexOfChild(parentPath.getLastPathComponent(),
-		// node);
-		// ZVTreeModel.this.fireTreeNodesChanged(this,
-		// parentPath.getPath(),
-		// new int[] { index } , new Object[] { node } );
+	        System.out.println("nodeDataChanged : " + node);
+	        // FLE+
+	        System.out.println("nodeDataChanged : " + node);
+	        TreePath parentPath = ZVTreeModel.this.getTreePath(node)
+	        .getParentPath();
+	        int index = ZVTreeModel.this.getIndexOfChild(
+	                parentPath.getLastPathComponent(), node);
+	        ZVTreeModel.this.fireTreeNodesChanged(this,
+	                parentPath.getPath(), new int[] { index },
+	                new Object[] { node });
 	    }
 
 	    @Override

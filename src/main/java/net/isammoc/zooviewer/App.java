@@ -116,6 +116,9 @@ public class App {
 			public void valueChanged(TreeSelectionEvent e) {
 			    // Create the array of selections
                 TreePath[] selPaths = tree.getSelectionModel().getSelectionPaths();
+                if ( selPaths == null ) {
+                    return;
+                }
                 ZVNode[] nodes = new ZVNode[selPaths.length];
                 for (int i = 0; i < selPaths.length; i++) {
                     nodes[i] = (ZVNode)selPaths[i].getLastPathComponent();
@@ -269,10 +272,10 @@ public class App {
 								.getSelectionModel();
 						selectionModel.clearSelection();
 						selectionModel.addSelectionPath(childPath);
+						
+						tree2.scrollPathToVisible( childPath );
 					}
 				});
-				// tree2.scrollPathToVisible( childPath );
-				// tree2.makeVisible( childPath );
 			}
 		});
 		return tree2;
