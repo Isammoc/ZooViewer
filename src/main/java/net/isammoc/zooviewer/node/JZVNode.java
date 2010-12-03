@@ -15,6 +15,7 @@
 package net.isammoc.zooviewer.node;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -37,6 +38,9 @@ import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 
 import net.isammoc.zooviewer.model.ZVModel;
 import net.isammoc.zooviewer.model.ZVModelListener;
@@ -59,6 +63,7 @@ public class JZVNode extends JPanel {
 
     private static final ResourceBundle bundle = ResourceBundle
             .getBundle(JZVNode.class.getCanonicalName());
+
     private final TitledBorder titleBorder = BorderFactory
             .createTitledBorder("-");
 
@@ -69,7 +74,6 @@ public class JZVNode extends JPanel {
     private final JButton jbUpdate = new JButton();
     private final JButton jbDelete = new JButton();
 
-    private final JTextArea taData = new JTextArea();
     private final JTextArea taChildData = new JTextArea();
     private final JTextField jtfChildName = new JTextField();
     private final JZVStat jzvStat = new JZVStat();
@@ -80,9 +84,9 @@ public class JZVNode extends JPanel {
     private Action deleteAction = null;
 
     private JPanel nodePanel = null;
-    private JPanel innerPanel = null;
+    private JPanel deletePanel = null;
     private JPanel statsPanel = null;
-    private JPanel updatePanel = null;
+    private JPanel dataPanel = null;
     private JPanel newChildPanel = null;
 
     private final PropertyChangeListener propertyListener = new PropertyChangeListener() {
@@ -105,10 +109,10 @@ public class JZVNode extends JPanel {
         this.model.addModelListener(new RefreshZVModelListener());
 
         // Components
-        this.taData.setEditable(false);
-        this.taData.setBorder(BEVEL_LOWERED_BORDER);
         this.taChildData.setBorder(BEVEL_LOWERED_BORDER);
         this.taUpdate.setBorder(BEVEL_LOWERED_BORDER);
+        this.taUpdate.setRows(2);
+        this.taChildData.setRows(2);
 
         // Actions
         this.jbDelete.setAction(getDeleteAction());
@@ -116,59 +120,63 @@ public class JZVNode extends JPanel {
         this.jbUpdate.setAction(getUpdateAction());
 
         // Main content
-        this.setBorder(this.titleBorder);
         this.add(getNodePanel());
         this.updateView();
+        
+        Dimension prefSize = this.jbNewChild.getPreferredSize();
+        this.jbDelete.setPreferredSize( prefSize );
+        this.jbNewChild.setPreferredSize( prefSize );
+        this.jbUpdate.setPreferredSize( prefSize );
+        
+        initListeners();
     }
 
+    /**
+     * Returns the main node panel.
+     * 
+     * @return the panel
+     */
     private JPanel getNodePanel() {
         if (nodePanel == null) {
             nodePanel = new JPanel(new GridBagLayout());
             
             // Sub-panels
-            nodePanel.add(
-                    getInnerPanel(),
-                    new GridBagConstraints(0, 0, 5, 1, 1, 1,
+            int row = 0;
+            nodePanel.add( 
+                    getDeletePanel(),
+                    new GridBagConstraints(0, row, 1, 1, 1, 1,
                             GridBagConstraints.WEST, GridBagConstraints.BOTH,
                             new Insets(2, 2, 2, 2), 0, 0));
-
             nodePanel.add(
                     getStatsPanel(),
-                    new GridBagConstraints(0, 1, 5, 1, 1, 1,
-                            GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL,
+                    new GridBagConstraints(1, row++, 4, 1, 1, 1,
+                            GridBagConstraints.WEST, GridBagConstraints.BOTH,
                             new Insets(2, 2, 2, 2), 0, 0));
     
             nodePanel.add(
-                    getUpdatePanel(),
-                    new GridBagConstraints(0, 2, 5, 1, 1, 1,
+                    getDataPanel(),
+                    new GridBagConstraints(0, row++, 5, 1, 1, 1,
                             GridBagConstraints.WEST, GridBagConstraints.BOTH,
                             new Insets(2, 2, 2, 2), 0, 0));
     
             nodePanel.add(
                     getNewChildPanel(),
-                    new GridBagConstraints(0, 3, 5, 1, 1, 1,
+                    new GridBagConstraints(0, row++, 5, 1, 1, 1,
                             GridBagConstraints.WEST, GridBagConstraints.BOTH,
                             new Insets(2, 2, 2, 2), 0, 0));
         }
         return nodePanel;
     }
 
-    /**
-     * Upper panel: node data + delete button.
-     * 
-     * @return the panel
-     */
-    private JPanel getInnerPanel() {
-        if (innerPanel == null) {
-            innerPanel = new JPanel(new GridBagLayout());
-            innerPanel.add(this.taData, new GridBagConstraints(0, 0, 3, 1, 1,
-                    1, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
-                    new Insets(2, 2, 2, 2), 0, 0));
-            innerPanel.add(this.jbDelete, new GridBagConstraints(4, 0, 1, 1, 1,
-                    1, GridBagConstraints.NORTHEAST, GridBagConstraints.NONE,
-                    new Insets(2, 2, 2, 2), 0, 0));
+    private JPanel getDeletePanel() {
+        if (deletePanel == null) {
+            deletePanel = new JPanel(new GridBagLayout());
+            deletePanel.setBorder(this.titleBorder);
+            deletePanel.add(this.jbDelete, new GridBagConstraints(0, 0, 1, 1,
+                    1, 1, GridBagConstraints.SOUTHWEST,
+                    GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
         }
-        return innerPanel;
+        return deletePanel;
     }
 
     /**
@@ -186,53 +194,50 @@ public class JZVNode extends JPanel {
         return statsPanel;
     }
 
-    private JPanel getUpdatePanel() {
-        if (updatePanel == null) {
-            updatePanel = new JPanel(new BorderLayout());
-            updatePanel.setBorder(BorderFactory.createTitledBorder(bundle
-                    .getString("pnl.updateData")));
-            JPanel innerUpdate = new JPanel(new GridBagLayout());
-            innerUpdate.add(this.taUpdate, new GridBagConstraints(0, 0, 1, 1,
+    private JPanel getDataPanel() {
+        if (dataPanel == null) {
+            dataPanel = new JPanel(new GridBagLayout());
+            dataPanel.setBorder(BorderFactory.createTitledBorder(bundle
+                    .getString("pnl.data")));
+            dataPanel.add(this.jbUpdate, new GridBagConstraints(0, 0, 1, 1,
+                    0, 0, GridBagConstraints.SOUTHWEST,
+                    GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
+            dataPanel.add(this.taUpdate, new GridBagConstraints(1, 0, 1, 1,
                     1, .5, GridBagConstraints.CENTER, GridBagConstraints.BOTH,
                     new Insets(2, 2, 2, 2), 0, 0));
-            innerUpdate.add(this.jbUpdate, new GridBagConstraints(1, 0, 1, 1,
-                    0, 0, GridBagConstraints.NORTHEAST,
-                    GridBagConstraints.NONE, new Insets(2, 2, 2, 2), 0, 0));
-            updatePanel.add(innerUpdate);
         }
-        return updatePanel;
+        return dataPanel;
     }
 
     private JPanel getNewChildPanel() {
         if (newChildPanel == null) {
-            newChildPanel = new JPanel(new BorderLayout());
+            newChildPanel = new JPanel(new GridBagLayout());
             newChildPanel.setBorder(BorderFactory.createTitledBorder(bundle
-                    .getString("pnl.newChild")));
-            JPanel innerNewChild = new JPanel(new GridBagLayout());
-            innerNewChild.add(
-                    new JLabel(bundle.getString("pnl.newChild.lbl.name")),
+                    .getString("pnl.new.child")));
+            newChildPanel.add(
+                    new JLabel(bundle.getString("pnl.new.child.lbl.name")),
                     new GridBagConstraints(0, 0, 1, 1, 0, 0,
                             GridBagConstraints.WEST,
                             GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2,
                                     2), 0, 0));
-            innerNewChild.add(this.jtfChildName,
+            newChildPanel.add(this.jtfChildName,
                     new GridBagConstraints(1, 0, 1, 1, 1, .2,
-                            GridBagConstraints.WEST,
+                            GridBagConstraints.NORTHWEST,
                             GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2,
                                     2), 0, 0));
-            innerNewChild.add(
-                    new JLabel(bundle.getString("pnl.newChild.lbl.data")),
+            newChildPanel.add(
+                    new JLabel(bundle.getString("pnl.new.child.lbl.data")),
                     new GridBagConstraints(0, 1, 1, 1, 0, 0,
-                            GridBagConstraints.WEST,
+                            GridBagConstraints.NORTHWEST,
                             GridBagConstraints.HORIZONTAL, new Insets(2, 2, 2,
                                     2), 0, 0));
-            innerNewChild.add(this.taChildData, new GridBagConstraints(1, 1, 1,
-                    1, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH,
+            newChildPanel.add(this.taChildData, new GridBagConstraints(1, 1, 1,
+                    2, 1, 1, GridBagConstraints.WEST, GridBagConstraints.BOTH,
                     new Insets(2, 2, 2, 2), 0, 0));
-            innerNewChild.add(this.jbNewChild, new GridBagConstraints(1, 2, 1,
-                    1, 0, 0, GridBagConstraints.EAST, GridBagConstraints.NONE,
+            
+            newChildPanel.add(this.jbNewChild, new GridBagConstraints(0, 1, 1,
+                    2, 0, 0, GridBagConstraints.SOUTHWEST, GridBagConstraints.NONE,
                     new Insets(2, 2, 2, 2), 0, 0));
-            newChildPanel.add(innerNewChild);
         }
         return newChildPanel;
     }
@@ -403,6 +408,56 @@ public class JZVNode extends JPanel {
         this.updateView();
     }
 
+    private void initListeners() {
+        taUpdate.getDocument().addDocumentListener( new DocumentListener() {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                enableAction(e);
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                enableAction(e);
+            }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                enableAction(e);
+            }
+            private void enableAction(DocumentEvent e) {
+                boolean enabled = e.getDocument().getLength() > 0;
+                getUpdateAction().setEnabled( enabled  );
+            }
+        });
+        jtfChildName.getDocument().addDocumentListener( new DocumentListener() {
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println(".removeUpdate()");
+                enableAction(e);
+            }
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                System.out.println(".insertUpdate()");
+                enableAction(e);
+            }
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                System.out.println(".changedUpdate()");
+                enableAction(e);
+            }
+            private void enableAction(DocumentEvent e) {
+                int docLength = e.getDocument().getLength();
+                boolean enabled;
+                try {
+                    enabled = ( docLength > 0 )
+                        && !e.getDocument().getText(0, docLength).trim().equals("");
+                    getAddChildAction().setEnabled( enabled  );
+                } catch (BadLocationException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
+    
     /**
      * Updates the view.
      * <p>
@@ -414,20 +469,22 @@ public class JZVNode extends JPanel {
         if (this.nodes == null || this.nodes.length > 1
                 || !this.nodes[0].exists()) {
             this.titleBorder.setTitle("-");
-            this.jbDelete.setEnabled(this.nodes != null);
-            this.taData.setText("");
-            this.jbNewChild.setEnabled(false);
-            this.jbUpdate.setEnabled(false);
             this.jzvStat.setStat(null);
+            this.taUpdate.setText("");
+            this.taChildData.setText("");
+            this.jbUpdate.setEnabled(false);
+            this.jbNewChild.setEnabled(false);
+            this.jbDelete.setEnabled(this.nodes != null);
         } else {
             this.titleBorder.setTitle(this.nodes[0].getPath());
-            this.jbDelete.setEnabled(true);
-            byte[] data = this.nodes[0].getData();
-            this.taData.setText(new String(data == null ? "null".getBytes()
-                    : data));
-            this.jbNewChild.setEnabled(true);
-            this.jbUpdate.setEnabled(true);
             this.jzvStat.setStat(this.nodes[0].getStat());
+            byte[] data = this.nodes[0].getData();
+            this.taUpdate.setText(new String(data == null ? "null".getBytes()
+                    : data));
+            this.taChildData.setText("");
+            this.jbUpdate.setEnabled( !this.taUpdate.getText().trim().equals("") );
+            this.jbNewChild.setEnabled( !this.jtfChildName.getText().trim().equals("") );
+            this.jbDelete.setEnabled(true);
         }
         this.repaint();
     }
@@ -438,17 +495,14 @@ public class JZVNode extends JPanel {
     private final class RefreshZVModelListener implements ZVModelListener {
         @Override
         public void nodeDeleted(ZVNode oldNode, int oldIndex) {
-            boolean updateView = false;
             if (nodes != null) {
                 for (int i = 0; i < nodes.length; i++) {
                     if ((nodes[i] == oldNode)
                             || (nodes[i] == model.getParent(oldNode))) {
-                        updateView = true;
+                        updateView();
+                        break;
                     }
                 }
-            }
-            if (updateView) {
-                updateView();
             }
         }
 
